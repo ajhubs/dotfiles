@@ -21,3 +21,5 @@ jobs:
         run: bash tests/install.sh
       - name: Test Vim filename escaping
         run: python3 tests/vim-save.py
+      - name: Test full Vim config with crafted selections and paths
+        run: python3 tests/vim-shortcuts.py

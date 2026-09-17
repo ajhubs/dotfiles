@@ -33,6 +33,17 @@ sudo apt update && sudo apt install vim-scripts
 The Vim `:w!!` shortcut shell-escapes the full filename and passes it after `--`
 to `tee`, so spaces and shell metacharacters are treated as filename content.
 
+The custom visual-selection `*` / `#` mappings and `<leader>te` shortcut have
+been removed: they could interpret crafted selected text or directory names
+as Vim commands. The `VisualSelection` and `CmdLine` helpers are also removed.
+Use Vim's built-in searches and `:tabedit` with filename completion instead.
+Restart Vim after updating so previously loaded mappings are discarded.
+
+These are per-user dotfiles. Root must not load configuration or plugins from
+a checkout writable by another user. A shared root configuration requires
+root-controlled files and parent directories; the installer does not change
+ownership or audit an existing shared installation.
+
 # Uninstallation
 
 ### Change to dotfiles folder
@@ -56,6 +67,7 @@ Run from the checkout on Linux with Bash, GNU coreutils, Python 3 and Vim:
 ```sh
 bash tests/install.sh
 python3 tests/vim-save.py
+python3 tests/vim-shortcuts.py
 ```
 
 Tests use temporary homes and a harmless `sudo` substitute; they do not modify
