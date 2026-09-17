@@ -12,7 +12,11 @@ exists() {
 }
 
 owned_link() {
-    [[ -L "$1" ]] && [[ "$(readlink -- "$1")" == "$2" ]]
+    local target
+    [[ -L "$1" ]] || return 1
+    # Read through NUL so trailing newlines remain part of the link target.
+    IFS= read -r -d '' target < <(readlink -z -- "$1") || return 1
+    [[ "$target" == "$2" ]]
 }
 
 move_without_overwrite() {

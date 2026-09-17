@@ -16,10 +16,17 @@ jobs:
         with:
           persist-credentials: false
       - name: Check Bash syntax
-        run: bash -n install.sh uninstall.sh lib/dotfiles.sh tests/install.sh
+        run: |
+          for file in .bash* install.sh uninstall.sh lib/*.sh tests/*.sh; do
+            bash -n "$file"
+          done
+      - name: Test Bash login initialization
+        run: python3 tests/bash-startup.py
       - name: Test installation and rollback
         run: bash tests/install.sh
       - name: Test Vim filename escaping
         run: python3 tests/vim-save.py
       - name: Test full Vim config with crafted selections and paths
         run: python3 tests/vim-shortcuts.py
+      - name: Test Vim startup with optional plugins
+        run: python3 tests/vim-startup.py

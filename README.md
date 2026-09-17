@@ -38,6 +38,11 @@ been removed: they could interpret crafted selected text or directory names
 as Vim commands. The `VisualSelection` and `CmdLine` helpers are also removed.
 Use Vim's built-in searches and `:tabedit` with filename completion instead.
 Restart Vim after updating so previously loaded mappings are discarded.
+NERDTree opens on an empty startup only if the plugin is available; it is optional.
+
+Login shells load your readable `~/.profile` inside and outside tmux. Interactive
+shells also load `.bashrc`, avoiding a duplicate load when `.profile` already
+sources it. You can still source `.bashrc` manually to reload settings.
 
 These are per-user dotfiles. Root must not load configuration or plugins from
 a checkout writable by another user. A shared root configuration requires
@@ -66,8 +71,10 @@ Run from the checkout on Linux with Bash, GNU coreutils, Python 3 and Vim:
 
 ```sh
 bash tests/install.sh
+python3 tests/bash-startup.py
 python3 tests/vim-save.py
 python3 tests/vim-shortcuts.py
+python3 tests/vim-startup.py
 ```
 
 Tests use temporary homes and a harmless `sudo` substitute; they do not modify
