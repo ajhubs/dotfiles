@@ -8,6 +8,12 @@ case $- in
       *) return;;
 esac
 
+# Tell .bash_profile when .profile has already loaded this interactive config.
+# This flag is temporary; manually sourcing .bashrc later still reloads it.
+if [ "${_dotfiles_login_startup-}" = 1 ]; then
+    _dotfiles_login_bashrc_loaded=1
+fi
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth

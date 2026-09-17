@@ -18,6 +18,11 @@ cd -- "$scratch/unrelated"
 
 check() { "$@" || { printf 'FAILED: %s\n' "$*" >&2; exit 1; }; }
 reject() { if "$@"; then printf 'Unexpected success: %s\n' "$*" >&2; exit 1; fi; }
+check_link_target() {
+    check test -L "$1"
+    # The sentinel preserves trailing newlines through command substitution.
+    check test "$(readlink -- "$1" && printf '.')" = "$2"$'\n.'
+}
 new_home() { export HOME="$scratch/$1"; mkdir -- "$HOME"; }
 install() { bash "$repo/install.sh"; }
 uninstall() { bash "$repo/uninstall.sh"; }
@@ -54,6 +59,30 @@ check test -L "$HOME/.bashrc.dtbak"
 uninstall
 check test -L "$HOME/.bashrc"
 check test "$(readlink -- "$HOME/.bashrc")" = "$scratch/missing-target"
+
+for suffix in $'\n' $'\n\n'; do
+    new_home "link target with ${#suffix} trailing newlines"
+    original_target="$repo/.bashrc$suffix"
+    ln -s -- "$original_target" "$HOME/.bashrc"
+    reject uninstall
+    check_link_target "$HOME/.bashrc" "$original_target"
+    install
+    check_link_target "$HOME/.bashrc" "$repo/.bashrc"
+    check_link_target "$HOME/.bashrc.dtbak" "$original_target"
+    uninstall
+    check_link_target "$HOME/.bashrc" "$original_target"
+    check test ! -e "$HOME/.bashrc.dtbak"
+    check test ! -L "$HOME/.bashrc.dtbak"
+done
+
+new_home 'readlink failure'
+ln -s -- "$repo/.bashrc" "$HOME/.bashrc"
+printf '#!/bin/bash\nexit 1\n' > "$scratch/bin/readlink"
+chmod +x "$scratch/bin/readlink"
+reject uninstall
+check test -L "$HOME/.bashrc"
+rm -- "$scratch/bin/readlink"
+check_link_target "$HOME/.bashrc" "$repo/.bashrc"
 
 new_home 'changed configuration'
 printf 'original\n' > "$HOME/.bashrc"
